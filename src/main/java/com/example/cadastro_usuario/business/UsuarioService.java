@@ -1,5 +1,7 @@
 package com.example.cadastro_usuario.business;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 import com.example.cadastro_usuario.infrastructure.entitys.Usuario;
@@ -14,14 +16,12 @@ public class UsuarioService {
         this.repo = repo;
     }
 
-    public void salvar(Usuario usuario) {
-        repo.saveAndFlush(usuario); //salva e fecha a conexão com o banco de dados
+    public Usuario salvar(Usuario usuario) {
+        return repo.saveAndFlush(usuario);
     }
 
-    public Usuario buscarUsuarioPorEmail(String email) {
-        return repo.findbyEmail(email).orElseThrow( 
-            ()-> new RuntimeException("Email não encontrado.")
-        );
+    public Optional<Usuario> buscarUsuarioPorEmail(String email) {
+        return repo.findbyEmail(email);
     }
 
     public void deletarUsuarioPorEmail(String email) {
@@ -29,7 +29,7 @@ public class UsuarioService {
     }
 
     //atualizar dado especifico passsando o objeto completo pra evitar "sobreescrição" do resto das informações
-    public void atualizarUsuarioPorID(Long id, Usuario usuario) {
+    public Usuario atualizarUsuarioPorID(Long id, Usuario usuario) {
         Usuario usuarioEntity = repo.findById(id)
             .orElseThrow( ()-> new RuntimeException("Usuario não encontrado"));
 
@@ -38,6 +38,6 @@ public class UsuarioService {
             .nome(usuario.getNome() != null ? usuario.getNome() : usuarioEntity.getNome())
             .build();
     
-        repo.saveAndFlush(usuarioAtualizado);
+        return repo.saveAndFlush(usuarioAtualizado);
     }
 }
